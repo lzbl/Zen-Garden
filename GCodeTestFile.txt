@@ -1,0 +1,30 @@
+# Assuming for now that MOVE allows the bse to rotate and stay at that position, while DRAW resets the base to it's original location
+# Note: if we go with this approoach, remember after DRAW to check if clockwise or counter-clockwise has the smaller angle
+
+# Clears Board
+1 1 0295 0000 000
+2 0295 0000 365
+
+# Tests creating line with rake
+1 4 -0354 0250 000
+2 0354 0250 000
+
+# Tests creating line with point
+1 3 -0500 0000 000
+2 0500 0000 000
+
+# Tests creating line with blunt
+1 2 -0354 -0250 000
+2 0354 -0250 000
+
+# Tests creating arc with rake
+1 4 0000 0500 000
+2 0000 0500 120
+
+# Tests creating arc with point
+1 3 0000 0500 120
+2 0000 0500 120
+
+# Tests creating arc with blunt
+1 2 0000 0500 120
+2 0000 0500 120
