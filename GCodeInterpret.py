@@ -2,7 +2,33 @@
 # coding: utf-8
 
 import os.path
-# import matlab.engine
+import matlab.engine
+
+
+#globals
+drawHeight = 13     # height difference from pylon top to sand
+moveHeight = 11
+toolHeight = -1  # height difference from pylon top to tool
+prevTool = "a"    # previous tool used (currently attached)
+x1 = -1          # position of pylon 1 in coordinate plane
+y1 = -1
+x2 = -1          # position of pylon 2 in coordinate plane
+y2 = -1
+x3 = -1          # position of pylon 3 in coordinate plane
+y3 = -1
+prev_11 = -1     # length of cable from pylon to initial position of current move
+prev_12 = -1
+prev_13 = -1
+totalRotation = 0   # sum of all angle rotations
+# dict of tool coordinates
+toolLoc = {
+        "clear": (-1,-1),
+        "blunt": (-1,-1),
+        "point": (-1,-1),
+        "rake": (-1,-1)
+        }
+
+
 
 # Reads in a GCode file and puts the commands into a list
 def read_gCode():
@@ -53,10 +79,51 @@ def read_gCode():
     
 def execute_command(commandList):
     
-    
     for command in commandList:
+        if command[0] == "move":
+            if command[1] != prevTool:
+                set_step_params(toolLoc[command[1]][0], toolLoc[command[1]][1], command[4], toolHeight)         # could use previous angle here to do rotation on move after getting tool, may not matter
+            set_step_params(command[2], command[3], command[4], moveHeight)
+            prevTool = command[1]
+        else:
+            set_step_params(command[1], command[2], command[3], drawHeight)
+            
+        # get feedback from simulink and wait for move to finish
+        totalRotation = totalRotation + a
+        
         
 
+def set_step_params(x, y, a, h):
+    d1 = sqrt((x1-x)**2 + (y1 - y)**2)
+    d2 = sqrt((x2-x)**2 + (y2 - y)**2)
+    d3 = sqrt((x3-x)**2 + (y3 - y)**2)
+    
+    l1 = sqrt(d1**2 + h**2)
+    l2 = sqrt(d2**2 + h**2)
+    l3 = sqrt(d3**2 + h**2)   
+    
+    # set param of len_to_steps(l1 - prev_l1)
+    # set param of len_to_steps(l2 - prev_l2)
+    # set param of len_to_steps(l3 - prev_l3)
+    # set param of angle_to_steps(a)
+    
+    #this will let us set all parameters simultaneously
+    #eng.set_param('SchemeName', 'ParameterName', len_to_steps(l1 - prev_l1), 'NextParamName', len_to_steps(l2 - prev_l2), and so on)
+   
+    
+    
+    
+    
+#def len_to_steps(l):
+    #convert cable length to steps
+    #return steps
+    
+#def angle_to_steps(a):
+    #convert rotation angle to steps (may be easier to just convert difference in angle)
+    # return steps
+    
+           
+# may want to do in main script/globally
 # def simulink():
 #     eng = matlab.engine.start_matlab()
 #     eng.sim("vdp")
