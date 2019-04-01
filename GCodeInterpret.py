@@ -3,6 +3,8 @@
 
 import os.path
 import matlab.engine
+import numpy as np
+import math
 
 
 #globals
@@ -94,13 +96,13 @@ def execute_command(commandList):
         
 
 def set_step_params(x, y, a, h):
-    d1 = sqrt((x1-x)**2 + (y1 - y)**2)
-    d2 = sqrt((x2-x)**2 + (y2 - y)**2)
-    d3 = sqrt((x3-x)**2 + (y3 - y)**2)
+    d1 = math.sqrt((x1-x)**2 + (y1 - y)**2)
+    d2 = math.sqrt((x2-x)**2 + (y2 - y)**2)
+    d3 = math.sqrt((x3-x)**2 + (y3 - y)**2)
     
-    l1 = sqrt(d1**2 + h**2)
-    l2 = sqrt(d2**2 + h**2)
-    l3 = sqrt(d3**2 + h**2)   
+    l1 = math.sqrt(d1**2 + h**2)
+    l2 = math.sqrt(d2**2 + h**2)
+    l3 = math.sqrt(d3**2 + h**2)   
     
     # set param of len_to_steps(l1 - prev_l1)
     # set param of len_to_steps(l2 - prev_l2)
@@ -109,18 +111,23 @@ def set_step_params(x, y, a, h):
     
     #this will let us set all parameters simultaneously
     #eng.set_param('SchemeName', 'ParameterName', len_to_steps(l1 - prev_l1), 'NextParamName', len_to_steps(l2 - prev_l2), and so on)
-   
+    eng = matlab.engine.start_matlab()
+    eng.udp_setup(angle_to_steps(a), 1, np.sign(a), len_to_steps(l1-prev_l1), 1, np.sign(l1-prev_l1), len_to_steps(l2-prev_l2), 1, np.sign(l2-prev_l2), len_to_steps(l3-prev_l3), 1, np.sign(l3-prev_l3), 0)
+    
+    prev_l1 = l1;
+    prev_l3 = l2;
+    prev_l2 = l3;
     
     
+    #cm
+def len_to_steps(l):
+    steps = l * 2.1 / 100
+    return steps
     
-    
-#def len_to_steps(l):
-    #convert cable length to steps
-    #return steps
-    
-#def angle_to_steps(a):
+def angle_to_steps(a):
     #convert rotation angle to steps (may be easier to just convert difference in angle)
-    # return steps
+    steps = abs(a) * 3260 / 360
+    return steps
     
            
 # may want to do in main script/globally
